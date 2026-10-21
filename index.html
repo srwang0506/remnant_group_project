@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="description" content="Inside REMNANT: six chapters, the laboratory's construction from floor plan and blockout to materials and lighting, five computational puzzles, and VR interaction." />
+    <meta property="og:title" content="Designing REMNANT: Echoes of Memory" />
+    <meta property="og:description" content="Building REMNANT's laboratory: original plans, blockout and finished scenes, alongside five computational puzzles and the ideas behind the game." />
+    <meta property="og:type" content="article" />
+    <meta property="og:image" content="https://srwang0506.github.io/remnant_group_project/media/cover.webp" />
+    <link rel="canonical" href="https://srwang0506.github.io/remnant_group_project/" />
+    <link rel="preload" href="/fonts/Lora-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <title>Designing REMNANT · Echoes of Memory</title>
+    <link rel="icon" type="image/x-icon" sizes="32x32" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon/favicon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body class="journal-page">
+    <a data-i18n="t001" class="skip-link" href="#article">Skip to article</a>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="wordmark journal-home" href="./" data-i18n-aria-label="a041" aria-label="REMNANT · Project home">
+          <span>REMNANT</span>
+        </a>
+        <div data-i18n-aria-label="a001" class="journal-language" role="group" aria-label="Article language" hidden>
+          <button type="button" data-language="en" lang="en" aria-pressed="true" aria-label="Read in English">EN</button>
+          <span class="journal-language-divider" aria-hidden="true">/</span>
+          <button type="button" data-language="zh" lang="zh-CN" aria-pressed="false" aria-label="切换到中文">中文</button>
+        </div>
+        <div class="theme-toggle-wrapper"></div>
+      </div>
+    </header>
+    <main id="article" class="journal" tabindex="-1">
+      <article>
+        <header class="journal-intro">
+          <p data-i18n="t003" class="journal-kicker">Game development · Design notes</p>
+          <h1 data-i18n="t004">Designing <em>REMNANT</em></h1>
+          <p data-i18n="t005" class="journal-subtitle">Echoes of Memory</p>
+          <p data-i18n="t006" class="journal-deck">How we connected computational puzzles, six changes of pace and a robot's search for human memory.</p>
+          <div class="journal-credits">
+            <p class="journal-authors"><span><strong>Sirui Wang</strong><sup>†‡</sup></span>, <span>Yangbolang Wu<sup>†</sup></span>, <span>Chengxuan Zou<sup>†</sup></span>, <span>Qiuhan Luo<sup>†</sup></span>, <span>Jing Qiu<sup>†</sup></span>, <span>Tongjia Gu<sup>†</sup></span></p>
+            <p data-i18n="t007">† All six authors contributed equally. ‡ Project lead.</p>
+          </div>
+          <div class="journal-actions"><a class="text-action" href="https://github.com/srwang0506/remnant_group_project" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6M14.5 4l-5 16"/></svg>
+            <span data-i18n="repository-link">View the project on GitHub</span>
+          </a>
+          <a class="journal-focus" href="#puzzles"><span data-i18n="t008">Inside Level 3: five puzzles, one laboratory</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v16m-6-6 6 6 6-6"/></svg></a>
+          </div>
+        </header>
+        <figure class="journal-cover">
+          <img data-i18n-alt="a002" src="/media/cover.webp" alt="REMNANT key art: NOVA stands beneath a mechanical eye, surrounded by fragments of a ruined civilization." width="1440" height="810" fetchpriority="high" />
+          <figcaption data-i18n="t009">REMNANT: Echoes of Memory · Unreal Engine 5 · C++ and Blueprints</figcaption>
+        </figure>
+        <div class="journal-layout">
+          <nav data-i18n-aria-label="a003" class="journal-toc" aria-label="Article contents">
+            <p data-i18n="t010">In this story</p>
+            <a data-i18n="t011" href="#story">Memory and order</a>
+            <a data-i18n="t012" href="#chapters">Six chapters</a>
+            <a data-i18n="scene-nav" href="#environment">Building the environment</a>
+            <a data-i18n="t013" href="#puzzles">Level 3: the laboratory</a>
+            <div class="journal-toc-rooms">
+              <a data-i18n="t014" href="#lab-pipes">01 · Pipes</a>
+              <a data-i18n="t015" href="#lab-wires">02 · Wires</a>
+              <a data-i18n="t016" href="#lab-gates">03 · Logic gates</a>
+              <a data-i18n="t017" href="#lab-maze">04 · Maze</a>
+              <a data-i18n="t018" href="#lab-lights">05 · Lights Out</a>
+            </div>
+            <a data-i18n="t019" href="#movement">Movement and devices</a>
+            <a data-i18n="t020" href="#systems">Keeping it coherent</a>
+            <a data-i18n="t021" href="#playtesting">Playtesting</a>
+          </nav>
+          <div class="journal-body">
+            <p data-i18n="t022" class="journal-lead">In REMNANT, we put a robot in a world that has survived its people. NOVA follows a program to rebuild Earth, while scattered memories gradually reveal what happened to humanity. The game asks what a machine should preserve when it reconstructs a human world.</p>
+            <p data-i18n="t023">We also wanted players to encounter computer science through action. A broken facility gave us a setting for that: routing signals, interpreting binary clues and changing the state of a room all become ways to move the story forward. The resulting game has six chapters, with a different kind of interaction in each.</p>
+
+            <section id="story">
+              <h2 data-i18n="t024">A machine's orders, a human's memories</h2>
+              <p data-i18n="t025">The story follows two lines. The machine side offers structure: an assistant provides hints, tasks state an objective, and driving assistance can help the player follow a route. These systems make order useful. The player has reasons to trust them.</p>
+              <p data-i18n="t026">Memory fragments complicate that trust. They reveal NOVA's identity and the human experiences hidden inside the robot's memory. Searching for them gives players a reason to explore beyond the obvious route. Progress through the world and recovery of the past happen together.</p>
+              <p data-i18n="t027">The final decision brings the two lines into conflict. Restoring human memories preserves emotion and the freedom to choose. Continuing as the Judicator prioritizes order and the reconstruction of Earth. We wanted the earlier interactions to give that decision some weight.</p>
+              <details class="journal-endings">
+                <summary data-i18n="t028">The two endings <span>(spoilers)</span></summary>
+                <div class="journal-pair">
+                  <figure>
+                    <img data-i18n-alt="a004" src="/media/awaken.webp" alt="NOVA releases human memories in the memory-restoration cinematic." width="1187" height="673" loading="lazy" decoding="async" />
+                    <figcaption data-i18n="t029">Awaken the memories. The journey continues into the ringworld.</figcaption>
+                  </figure>
+                  <figure>
+                    <img data-i18n-alt="a005" src="/media/order.webp" alt="A robot framed by a circular light in the Order Endures ending." width="1155" height="512" loading="lazy" decoding="async" />
+                    <figcaption data-i18n="t030">Become the Judicator. Rebuild Earth through machine order.</figcaption>
+                  </figure>
+                </div>
+              </details>
+            </section>
+
+            <section id="chapters">
+              <h2 data-i18n="t031">Six chapters, six changes of pace</h2>
+              <p data-i18n="t032">The changes in movement are part of the narrative rhythm. Driving gives the player time to look around. The laboratory slows the pace and asks for careful reasoning. Grappling and combat then demand quicker decisions. Flight opens up the space again, giving the memory-restoration ending a sense of release.</p>
+              <div class="journey-grid">
+                <figure>
+                  <img data-i18n-alt="a006" src="/media/base.webp" alt="The interior of NOVA's starting base." width="1280" height="720" loading="lazy" decoding="async" />
+                  <figcaption data-i18n="t033"><span>01 · Awakening</span>Learn to move and interact. A companion and a letter introduce the world.</figcaption>
+                </figure>
+                <figure>
+                  <img data-i18n-alt="a007" src="/media/development-zone.webp" alt="NOVA drives across open terrain toward the laboratory." width="1280" height="720" loading="lazy" decoding="async" />
+                  <figcaption data-i18n="t034"><span>02 · Development zone</span>Explore the ruins by vehicle and find a route to the laboratory.</figcaption>
+                </figure>
+                <figure>
+                  <img data-i18n-alt="a008" src="/media/puzzle-lab.webp" alt="The laboratory's grid of glowing Lights Out panels." width="1280" height="720" loading="lazy" decoding="async" />
+                  <figcaption data-i18n="t035"><span>03 · Laboratory</span>Restore the facility through five puzzles built around computational ideas.</figcaption>
+                </figure>
+                <figure>
+                  <img data-i18n-alt="a009" src="/media/chase.webp" alt="Elevated platforms and routes through the ruined city." width="1280" height="720" loading="lazy" decoding="async" />
+                  <figcaption data-i18n="t036"><span>04 · The pursuit</span>Chase a memory fragment through jumps, grappling and vertical routes.</figcaption>
+                </figure>
+                <figure>
+                  <img data-i18n-alt="a010" src="/media/judicator.webp" alt="NOVA battles the Judicator inside the control hub." width="1280" height="720" loading="lazy" decoding="async" />
+                  <figcaption data-i18n="t037"><span>05 · Control hub</span>Face the Judicator, uncover the truth and make the final choice.</figcaption>
+                </figure>
+                <figure>
+                  <img data-i18n-alt="a011" src="/media/ringworld.webp" alt="Flight through the curved city and glowing rings of the ringworld." width="1280" height="720" loading="lazy" decoding="async" />
+                  <figcaption data-i18n="t038"><span>06 · Ringworld</span>Take flight after awakening the memories. This chapter belongs to that ending.</figcaption>
+                </figure>
+              </div>
+              <figure class="journal-film">
+                <video data-i18n-aria-label="a012" controls playsinline preload="none" poster="/media/cover.webp" aria-label="REMNANT gameplay highlights" aria-describedby="film-caption">
+                  <source src="/media/gameplay-one-minute.mp4" type="video/mp4" />
+                  <a data-i18n="t039" href="./media/gameplay-one-minute.mp4">Open the gameplay video</a>
+                </video>
+                <figcaption data-i18n="t040" id="film-caption">A one-minute tour of all six chapters: awakening in the base, driving, laboratory puzzles, grappling, the Judicator battle and ringworld flight. Silent video.</figcaption>
+              </figure>
+            </section>
+
+            <section id="environment">
+              <h2 data-i18n="scene-title">Building the environment</h2>
+              <p data-i18n="scene-intro">The laboratory shows how one of REMNANT's environments took shape. We began with a floor plan, built the rooms in simple geometry, then added the structures, materials and lighting that give the facility its character. The development captures below show both the overall layout and the changes inside one room.</p>
+
+              <h3 data-i18n="scene-plan-title">Planning the rooms and routes</h3>
+              <p data-i18n="scene-plan-text">The 2D draft establishes a central meeting point, branches for the puzzle rooms and an exit toward the next chapter. Drawing these connections first lets us think about how a player moves between activities before committing to detailed geometry.</p>
+              <p data-i18n="scene-blockout-text">Those lines become corridors, room volumes and maze walls in the blockout. Plain surfaces and checkerboard grids keep the structure easy to inspect. At this stage, the useful questions are spatial: how rooms connect, how much space a platform offers, and where a change in height interrupts the route.</p>
+              <div class="lab-pair scene-pair scene-stages">
+                <figure>
+                  <a data-i18n-aria-label="scene-plan-link" href="./media/scene-plan.png" target="_blank" rel="noopener" aria-label="View the original laboratory floor-plan draft"><img data-i18n-alt="scene-plan-alt" src="/media/scene-plan.png" alt="Original 2D laboratory draft with branching corridors, puzzle rooms and an exit toward the next chapter." width="797" height="612" loading="lazy" decoding="async" /></a>
+                  <figcaption data-i18n="scene-plan-caption"><span>01 · Floor-plan draft</span>Room connections and the route through the level come first.</figcaption>
+                </figure>
+                <figure>
+                  <a data-i18n-aria-label="scene-blockout-link" href="./media/scene-blockout.jpg" target="_blank" rel="noopener" aria-label="View the laboratory blockout from above"><img data-i18n-alt="scene-blockout-alt" src="/media/scene-blockout.jpg" alt="Overhead blockout of the laboratory, with plain room volumes, corridors and a checkerboard maze." width="1008" height="590" loading="lazy" decoding="async" /></a>
+                  <figcaption data-i18n="scene-blockout-caption"><span>02 · Blockout</span>The plan becomes a connected space built from simple forms.</figcaption>
+                </figure>
+              </div>
+
+              <h3 data-i18n="scene-material-title">Assembling the facility, room by room</h3>
+              <p data-i18n="scene-material-text">Using that structure as a scaffold, we assembled corridor sections, framed floors and mechanical walls. The intermediate view still has unfinished white rooms beside dressed corridors. It records the gradual replacement of the test geometry, with the network of rooms remaining recognizable throughout.</p>
+              <div class="lab-pair scene-pair scene-stages">
+                <figure>
+                  <a data-i18n-aria-label="scene-progress-link" href="./media/scene-material-pass.jpg" target="_blank" rel="noopener" aria-label="View the laboratory during the material and structure pass"><img data-i18n-alt="scene-progress-alt" src="/media/scene-material-pass.jpg" alt="An intermediate overhead view with detailed corridors and a glowing central hub beside rooms that still use plain blockout surfaces." width="902" height="565" loading="lazy" decoding="async" /></a>
+                  <figcaption data-i18n="scene-progress-caption"><span>03 · Material and structure pass</span>Finished corridor sections sit alongside rooms still in blockout.</figcaption>
+                </figure>
+                <figure>
+                  <a data-i18n-aria-label="scene-assembled-link" href="./media/scene-assembled.jpg" target="_blank" rel="noopener" aria-label="View the assembled laboratory from above"><img data-i18n-alt="scene-assembled-alt" src="/media/scene-assembled.jpg" alt="The assembled laboratory with a warm circular hub, cyan light grid, metal corridors and the platform room on the right." width="815" height="787" loading="lazy" decoding="async" /></a>
+                  <figcaption data-i18n="scene-assembled-caption"><span>04 · Assembled environment</span>The hub and puzzle rooms gain distinct surfaces and lighting.</figcaption>
+                </figure>
+              </div>
+              <p data-i18n="scene-landmarks-text">In the later view, the warm circular hub and the cyan light matrix form clear landmarks. Repeated wall and floor panels connect the rooms visually, while the machinery and lighting distinguish their functions. The facility gains detail without losing the outline established by the plan.</p>
+
+              <h3 data-i18n="scene-room-title">Materials and light inside the pipe chamber</h3>
+              <p data-i18n="scene-room-text">The pipe chamber gives a closer comparison. Its blockout already contains stepped platforms, wall-mounted valves and a raised exit. The finished pass adds metal frames, panel seams and surface detail to these forms. Cyan energy below the platforms separates the lower area from the solid surfaces that carry the route.</p>
+              <div class="lab-pair scene-pair">
+                <figure>
+                  <a data-i18n-aria-label="a018" href="./media/lab-whitebox.webp" target="_blank" rel="noopener" aria-label="View the laboratory white-box prototype"><img data-i18n-alt="a019" src="/media/lab-whitebox.webp" alt="White-box pipe chamber with checkerboard walls, platforms and a raised exit." width="1003" height="600" loading="lazy" decoding="async" /></a>
+                  <figcaption data-i18n="t061">Blockout: platforms, height changes and the exit establish the route.</figcaption>
+                </figure>
+                <figure>
+                  <a data-i18n-aria-label="a020" href="./media/lab-finished.webp" target="_blank" rel="noopener" aria-label="View the finished pipe chamber"><img data-i18n-alt="a021" src="/media/lab-finished.webp" alt="The finished pipe chamber with mechanical platforms above a cyan energy field." width="926" height="599" loading="lazy" decoding="async" /></a>
+                  <figcaption data-i18n="t062">Finished room: mechanical surfaces and cyan light give the route its setting.</figcaption>
+                </figure>
+              </div>
+
+              <h3 data-i18n="scene-guidance-title">Keeping the route legible</h3>
+              <p data-i18n="t060">Glass partitions reveal the destination while the actual route takes a detour. The two-floor structure also lets us create a shortcut: after solving a puzzle, the player can drop from the upper level to the lower one. The space becomes easier to traverse as the player understands it. We placed the binary hint before the maze entrance, where it can inform the next decision.</p>
+              <p data-i18n="scene-feedback-text">The room also needs to show what a solution changes. Restoring a circuit opens a door or removes a barrier, so progress on a puzzle becomes a visible change in the environment. This connects the layout, its visual cues and the player's actions.</p>
+            </section>
+
+            <section id="puzzles">
+              <h2 data-i18n="t041">Inside Level 3: the laboratory</h2>
+              <p data-i18n="t042">One of REMNANT's distinctive features is its laboratory chapter, where computer science concepts become puzzles in a 3D space. Five puzzle areas ask the player to reason about different kinds of systems: a connected path, competing routes, a signal network, a maze with conditional doors, and a floor of interacting binary states. Solving them restores the facility and changes where NOVA can go.</p>
+              <nav data-i18n-aria-label="a013" class="lab-index" aria-label="Laboratory design topics">
+                <a data-i18n="t043" href="#lab-space">The space</a><a data-i18n="t044" href="#lab-pipes">Pipes</a><a data-i18n="t045" href="#lab-wires">Wires</a><a data-i18n="t046" href="#lab-gates">Logic gates</a><a data-i18n="t047" href="#lab-maze">Maze</a><a data-i18n="t048" href="#lab-lights">Lights Out</a><a data-i18n="t049" href="#lab-vr">VR &amp; feedback</a>
+              </nav>
+              <figure class="journal-film lab-film">
+                <video data-i18n-aria-label="a014" id="lab-film" controls playsinline preload="none" poster="/media/lab-finished.webp" aria-label="The five laboratory puzzles in REMNANT" aria-describedby="lab-film-caption">
+                  <source src="/media/laboratory.mp4" type="video/mp4" />
+                  <a data-i18n="t050" href="./media/laboratory.mp4">Open the laboratory video</a>
+                </video>
+                <figcaption data-i18n="t051" id="lab-film-caption">53 seconds inside the laboratory. Rotate a pipe route, connect colored terminals, build a signal circuit, read the maze and change the light floor. Silent gameplay.</figcaption>
+                <div data-i18n-aria-label="a015" class="film-chapters" role="group" aria-label="Play a laboratory video chapter" hidden>
+                  <button data-i18n="t052" type="button" data-lab-start="0"><span>0:00</span> Pipes</button>
+                  <button data-i18n="t053" type="button" data-lab-start="8"><span>0:08</span> Wires</button>
+                  <button data-i18n="t054" type="button" data-lab-start="21"><span>0:21</span> Logic gates</button>
+                  <button data-i18n="t055" type="button" data-lab-start="34"><span>0:34</span> Maze</button>
+                  <button data-i18n="t056" type="button" data-lab-start="45"><span>0:45</span> Lights Out</button>
+                </div>
+              </figure>
+
+              <h3 data-i18n="t057" id="lab-space">A facility with a readable layout</h3>
+              <figure class="journal-map">
+                <a data-i18n-aria-label="a016" href="./media/lab-map.webp" target="_blank" rel="noopener" aria-label="View the full laboratory plan"><img data-i18n-alt="a017" src="/media/lab-map.webp" alt="Laboratory plan with a central hub connecting the maze, logic gates, lighting, pipe and wire rooms." width="1145" height="950" loading="lazy" decoding="async" /></a>
+                <figcaption data-i18n="t058">A central hub connects the five puzzle areas.</figcaption>
+              </figure>
+              <p data-i18n="t059">The central hub gives players a familiar place to return to between puzzle rooms. Each branch has its own visual identity, so a player can recognize the light floor or the pipe chamber before opening a puzzle interface. The <a href="#environment">environment study above</a> follows the construction of this layout.</p>
+
+              <h3 data-i18n="t063" id="lab-pipes">01 · Pipes: finding the path that carries power</h3>
+              <figure class="lab-aside lab-pipe-image">
+                <a data-i18n-aria-label="a022" href="./media/lab-pipes.webp" target="_blank" rel="noopener" aria-label="View the pipe puzzle board"><img data-i18n-alt="a023" src="/media/lab-pipes.webp" alt="A five-by-five board of rotating orange and purple pipes, with decoy pieces and an Enable Circuit button." width="680" height="590" loading="lazy" decoding="async" /></a>
+                <figcaption data-i18n="t064">Some pieces are decoys. Only the linked route affects power.</figcaption>
+              </figure>
+              <p data-i18n="t065">The pipe board has 25 cells. Players rotate segments to carry power from the input to the output, then use <em>Enable Circuit</em> to test the route. Some pieces are decoys: making them look connected contributes nothing to the powered path.</p>
+              <p data-i18n="t066">That distinction gives the puzzle its purpose. The player has to trace which components belong to the working system and check their orientation. Local connections only help when they form a continuous route. Completing the circuit unlocks the physical way forward in the chamber, tying the result on the panel to movement through the room.</p>
+
+              <h3 data-i18n="t067" id="lab-wires">02 · Wires: several routes sharing one board</h3>
+              <p data-i18n="t068">The wire puzzle asks players to connect matching colored terminals across a limited grid. A route that works on its own can occupy the only corridor another wire needs. Players often have to reconsider an earlier connection to make the whole layout work.</p>
+              <figure class="lab-figure">
+                <a data-i18n-aria-label="a024" href="./media/lab-wires.webp" target="_blank" rel="noopener" aria-label="View the wire-routing board"><img data-i18n-alt="a025" src="/media/lab-wires.webp" alt="Colored wires take different paths across a circuit board; several terminal pairs still need a connection." width="1259" height="669" loading="lazy" decoding="async" /></a>
+                <figcaption data-i18n="t069">Each route consumes space that other connections may need.</figcaption>
+              </figure>
+              <p data-i18n="t070">We drew on the layout problem in printed circuit boards. Every required connection has to coexist with the others. The interface tracks progress through successive routing stages; glowing paths show completed connections, and Reset lets the player try another arrangement. Completing the connections drives the room's door-opening animation.</p>
+
+              <h3 data-i18n="t071" id="lab-gates">03 · Logic gates: building a valid signal network</h3>
+              <p data-i18n="t072">Our gate puzzle combines three signal states, red, blue and white, with a limited inventory of five operations. Players arrange gates and wires in columns. Signals move from left to right through every column; an empty cell can carry a wire, while an occupied gate cell blocks unrelated routes.</p>
+              <figure class="lab-figure">
+                <a data-i18n-aria-label="a026" href="./media/lab-gates.webp" target="_blank" rel="noopener" aria-label="View the logic-gate puzzle"><img data-i18n-alt="a027" src="/media/lab-gates.webp" alt="Three columns of signal gates connect two sources to three target terminals, using SPLIT, RED and SWAP operations." width="1151" height="613" loading="lazy" decoding="async" /></a>
+                <figcaption data-i18n="t073">The board combines signal transformations, port counts and spatial routing.</figcaption>
+              </figure>
+              <p data-i18n="t074">We implemented the gate logic in C++. Run checks the target colors together with the wiring rules. It rejects a two-input gate with only one input, a wire that skips a column, or a SPLIT output left unconnected. Every generated signal must have somewhere to go. Once the circuit passes validation, the laser barrier clears.</p>
+              <details class="journal-detail">
+                <summary data-i18n="t075">The five operations and the signal-count constraint</summary>
+                <div class="detail-body">
+                  <table class="lab-table">
+                    <caption data-i18n="t076">Examples from the game's three-color gate rules</caption>
+                    <thead><tr><th data-i18n="t077" scope="col">Gate</th><th data-i18n="t078" scope="col">Ports</th><th data-i18n="t079" scope="col">Example</th></tr></thead>
+                    <tbody>
+                      <tr><th scope="row">RED</th><td data-i18n="t080">2 in, 1 out</td><td>R + B → R</td></tr>
+                      <tr><th scope="row">BLUE</th><td data-i18n="t081">2 in, 1 out</td><td>R + B → B</td></tr>
+                      <tr><th scope="row">CROSS</th><td data-i18n="t082">2 in, 1 out</td><td>R + B → W</td></tr>
+                      <tr><th scope="row">SWAP</th><td data-i18n="t083">1 in, 1 out</td><td>R → B; W → W</td></tr>
+                      <tr><th scope="row">SPLIT</th><td data-i18n="t084">1 in, 2 out</td><td>W → R + B</td></tr>
+                    </tbody>
+                  </table>
+                  <p data-i18n="t085">SPLIT is the only legal way to branch a signal. A gate with two inputs consumes two signals and produces one; SWAP leaves the count unchanged. With no unused outputs, a valid board must satisfy:</p>
+                  <p data-i18n="t138" class="lab-equation">Targets = sources + SPLIT gates − two-input gates</p>
+                  <p data-i18n="t086">Two sources and three targets therefore require one more SPLIT than merging gate. This gives the player a way to rule out an impossible design before routing every wire. The remaining task is to achieve the target colors within the available columns and gate inventory.</p>
+                </div>
+              </details>
+
+              <h3 data-i18n="t087" id="lab-maze">04 · The maze: decoding an instruction, then judging a door</h3>
+              <p data-i18n="t088">A binary message on the wall becomes an ordered sequence of door numbers. The example route in our guide is <span class="lab-sequence">2 → 1 → 3 → 2 → 3</span>. Entering the maze turns that decoded instruction into a spatial problem: the player has to find a usable door for each step.</p>
+              <div class="lab-pair">
+                <figure>
+                  <a data-i18n-aria-label="a028" href="./media/lab-binary.webp" target="_blank" rel="noopener" aria-label="View the binary clue"><img data-i18n-alt="a029" src="/media/lab-binary.webp" alt="A binary message projected onto the laboratory wall above a desk." width="764" height="416" loading="lazy" decoding="async" /></a>
+                  <figcaption data-i18n="t089">The clue appears before the maze.</figcaption>
+                </figure>
+                <figure>
+                  <a data-i18n-aria-label="a030" href="./media/lab-doors.webp" target="_blank" rel="noopener" aria-label="View the numbered maze doors"><img data-i18n-alt="a031" src="/media/lab-doors.webp" alt="Numbered brown doors at a junction in the white maze." width="764" height="416" loading="lazy" decoding="async" /></a>
+                  <figcaption data-i18n="t090">The number and the door's behavior both affect the route.</figcaption>
+                </figure>
+              </div>
+              <p data-i18n="t091">We gave the doors six behaviors. They make the player check whether a route is actually available, and from which direction. A room can be understood as a graph node; a door adds an edge with a condition, a direction or a changing label.</p>
+              <dl class="door-rules">
+                <div><dt data-i18n="t092">Real</dt><dd data-i18n="t093">Opens or disappears as the player approaches.</dd></div>
+                <div><dt data-i18n="t094">Fake</dt><dd data-i18n="t095">Shows a number but does not open.</dd></div>
+                <div><dt data-i18n="t096">Number-changing</dt><dd data-i18n="t097">Updates its label when approached or used.</dd></div>
+                <div><dt data-i18n="t098">Double-numbered</dt><dd data-i18n="t099">Displays a different number on each side.</dd></div>
+                <div><dt data-i18n="t100">One-way</dt><dd data-i18n="t101">Allows passage in only one direction.</dd></div>
+                <div><dt data-i18n="t102">Two-way</dt><dd data-i18n="t103">Lets the player return and recheck a junction.</dd></div>
+              </dl>
+              <p data-i18n="t104">The clue supplies an instruction sequence; observation decides how to carry it out. A matching number on a fake door still leaves the player looking for a valid passage. That is where binary decoding meets conditional reasoning and graph traversal.</p>
+
+              <h3 data-i18n="t105" id="lab-lights">05 · Lights Out: an algorithm you can walk into</h3>
+              <p data-i18n="t106">In the light room, the player operates a floor of 25 blocks. Pressing one reverses its state and the states of its horizontal and vertical neighbors. Correcting an orange block can undo a nearby cyan one, so each move has to account for the surrounding pattern.</p>
+              <figure class="lab-figure">
+                <a data-i18n-aria-label="a032" href="./media/puzzle-lab.webp" target="_blank" rel="noopener" aria-label="View the full light floor"><img data-i18n-alt="a033" src="/media/puzzle-lab.webp" alt="The full five-by-five light floor, with cyan and orange blocks extending toward the exit." width="1280" height="720" loading="lazy" decoding="async" /></a>
+                <figcaption data-i18n="t107">The board is part of the room. Each block has a row, a column and a visible binary state.</figcaption>
+              </figure>
+              <p data-i18n="t108">We map the blocks' 3D positions to their grid coordinates and broadcast state changes to the affected neighbors. The immediate change in color lets the player test the rule in place. Cyan is the target state; restoring all 25 panels completes the mechanism.</p>
+              <p data-i18n="t109">This is a classic algorithmic puzzle: each press is a binary decision, and the local flip rule allows a small search over the first row to determine the entire solution. Our contribution is its place in the laboratory: a familiar algorithm becomes a floor the player can explore, test and restore.</p>
+              <div class="lights-example" aria-labelledby="lights-title">
+                <div class="lights-explanation">
+                  <h4 data-i18n="t110" id="lights-title">Try the laboratory rule</h4>
+                  <p data-i18n="t111">Press a tile and watch its neighbors. Press it again to reverse the change.</p>
+                  <p data-i18n="t112" class="lights-legend"><span><i class="light-on" aria-hidden="true"></i> Active</span><span><i class="light-off" aria-hidden="true"></i> Inactive</span></p>
+                  <p id="lights-status" class="lights-status" role="status" aria-live="polite"></p>
+                  <button data-i18n="t113" id="lights-reset" class="pill-link" type="button">Reset example</button>
+                </div>
+                <div data-i18n-aria-label="a034" id="lights-board" class="lights-board" role="group" aria-label="Five by five Lights Out example"></div>
+                <noscript><p data-i18n="t114">Enable JavaScript to try the rule. Each press flips its tile and up to four adjacent tiles.</p></noscript>
+              </div>
+              <details id="lights-algorithm" class="journal-detail algorithm-detail">
+                <summary data-i18n="t115">Algorithm notebook <span>Model, proof, Python implementation &amp; references</span></summary>
+                <div class="detail-body algorithm-content" data-algorithm-language="en" lang="en">
+                  <!-- lights-algorithm:en -->
+                </div>
+                <div class="detail-body algorithm-content" data-algorithm-language="zh" lang="zh-CN" hidden>
+                  <!-- lights-algorithm:zh -->
+                </div>
+              </details>
+
+              <h3 data-i18n="t116" id="lab-vr">Using the room with your hands</h3>
+              <figure class="lab-aside">
+                <a data-i18n-aria-label="a035" href="./media/lab-vr.webp" target="_blank" rel="noopener" aria-label="View the Vive laboratory demonstration"><img data-i18n-alt="a036" src="/media/lab-vr.webp" alt="A visitor uses a Vive headset and motion controllers to explore the laboratory at a public demonstration." width="1280" height="854" loading="lazy" decoding="async" /></a>
+                <figcaption data-i18n="t117">The laboratory running with Vive at a public demonstration.</figcaption>
+              </figure>
+              <p data-i18n="t118">Level 3 also supports Vive VR interaction. Players can grab, rotate, connect and trigger objects with tracked controllers. The puzzle system validates those actions against the same rules used for desktop interaction. A physical gesture changes a puzzle state only when the connection or action is valid.</p>
+              <p data-i18n="t119">We also built recovery into the space. Trigger volumes below the platforms reset NOVA's position and orientation after a fall, so an unsuccessful jump does not leave the player stranded beneath the room. Restored circuits open doors or remove barriers, giving each solution a visible consequence beyond its interface.</p>
+              <p data-i18n="t120">The laboratory's exit checks both completed puzzles and the memory fragment. That joins the two reasons to explore: repairing the facility and recovering the story hidden inside it.</p>
+            </section>
+
+            <section id="movement">
+              <h2 data-i18n="t121">Movement changes how the story feels</h2>
+              <p data-i18n="t122">Grappling pulls the player toward an anchor while accounting for velocity, gravity and collisions. Flight gives the player control over pitch and momentum, with boosts and updrafts modifying motion. The feedback matters because the player needs to feel the consequences of an input quickly enough to plan the next one.</p>
+              <p data-i18n="t123">The Judicator encounter changes the demands again. Its floating eye can fire a laser, while sprint attacks and summoned robots shift the player's attention between evasion and combat. Vulnerability phases create opportunities to act. These changes in pressure give the encounter its rhythm.</p>
+              <p data-i18n="t124">Driving supports both joystick and gyroscope steering. We separated the assistance into heading correction with a PD controller and speed regulation with a PID controller. Different camera perspectives and a minimal interface leave space to read the landscape on the way to the laboratory.</p>
+              <div class="lab-pair">
+                <figure>
+                  <a data-i18n-aria-label="a037" href="./media/driving-joystick.webp" target="_blank" rel="noopener" aria-label="View the joystick driving demonstration"><img data-i18n-alt="a038" src="/media/driving-joystick.webp" alt="Driving the development-zone vehicle with the joystick on a game controller." width="870" height="652" loading="lazy" decoding="async" /></a>
+                  <figcaption data-i18n="t125">Joystick steering.</figcaption>
+                </figure>
+                <figure>
+                  <a data-i18n-aria-label="a039" href="./media/driving-gyro.webp" target="_blank" rel="noopener" aria-label="View the gyroscope driving demonstration"><img data-i18n-alt="a040" src="/media/driving-gyro.webp" alt="Tilting the game controller to steer through the development zone with gyroscope input." width="870" height="652" loading="lazy" decoding="async" /></a>
+                  <figcaption data-i18n="t126">Gyroscope steering.</figcaption>
+                </figure>
+              </div>
+            </section>
+
+            <section id="systems">
+              <h2 data-i18n="t127">Keeping the journey coherent</h2>
+              <p data-i18n="t128">The game uses Blueprints for much of its flow and C++ for core systems. We organized progression around story, level and local interaction states. Solving a puzzle generates an event, and the game checks the relevant conditions before changing the story or loading another level.</p>
+              <p data-i18n="t129">For example, leaving the laboratory requires both its puzzles and the memory fragment. Save data records completed puzzles, collected fragments, the player's choice and the last checkpoint. Those details matter when a game keeps changing its mechanics: the player's progress has to survive the transition.</p>
+              <h3 data-i18n="t130">An experiment in boss decisions</h3>
+              <p data-i18n="t131">Another direction was to learn boss behavior from combat footage. We explored recognizing and imitating actions from recorded encounters, then using a world model to score candidate moves by hit rate, risk and positional gain. We presented this as exploratory work. Evaluating how those decisions affect the experience of a fight is a further question.</p>
+            </section>
+
+            <section id="playtesting">
+              <h2 data-i18n="t132">What we looked for in playtesting</h2>
+              <p data-i18n="t133">We collected 79 questionnaire responses and demonstrated the game at the Shandong Science and Technology Festival and a library showcase. The evaluation considered usability, engagement, immersion and interaction clarity. Our testing plan also called for recording confusion points, task completion times and difficulty with the controls.</p>
+              <p data-i18n="t134">For a game built around discovering rules, confusion needs careful interpretation. A player may be thinking through a puzzle, or may simply have missed the clue that explains how to interact. Our map design puts hints before the maze and keeps destinations visible so that players can spend more of their attention on the problem itself.</p>
+              <p data-i18n="t135">The questionnaires describe players' experience of the game. Measuring how much computer science they learned would require a separate study. Our design goal here was to make the ideas available through play: a route that can be reasoned about, a circuit that can be tested, and a pattern of lights whose behavior eventually makes sense.</p>
+            </section>
+            <footer class="journal-footer">
+              <a class="journal-back text-action" href="https://srwang0506.github.io/">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12H4m6-6-6 6 6 6"/></svg>
+                <span data-i18n="t136">Back to home</span>
+              </a>
+              <span data-i18n="t137">REMNANT · A project by six equal contributors</span>
+            </footer>
+          </div>
+        </div>
+      </article>
+    </main>
+  </body>
+</html>

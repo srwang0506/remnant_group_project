@@ -1,0 +1,28 @@
+{
+  "name": "remnant_group_project",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "python3 -B tests/lights_solver_test.py"
+  },
+  "devDependencies": {
+    "@mdit/plugin-katex": "^0.25.2",
+    "katex": "^0.16.47",
+    "markdown-it": "^14.3.2",
+    "shiki": "^4.4.3",
+    "vite": "^6.0.0"
+  },
+  "version": "1.0.0",
+  "description": "The bilingual development journal for REMNANT: Echoes of Memory.",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/srwang0506/remnant_group_project.git"
+  },
+  "homepage": "https://srwang0506.github.io/remnant_group_project/"
+}
